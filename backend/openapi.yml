@@ -1,0 +1,163 @@
+openapi: 3.0.0
+info:
+  title: Analysis Results API
+  version: 1.0.0
+  description: API for submitting sequences and retrieving their processing results.
+servers:
+  - url: http://localhost:8080
+    description: Local server for backend
+
+paths:
+  /api/analyze:
+    post:
+      summary: Submit sequences for analysis
+      requestBody:
+        description: Submit sequences for comparison and analysis
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sequence_wt:
+                  type: string
+                  description: Wild-type sequence
+                  example: "AUGGCCUAA"
+                sequence_mt:
+                  type: string
+                  description: Mutant sequence
+                  example: "AUGGCCGUA"
+              required:
+                - sequence_wt
+                - sequence_mt
+      responses:
+        '200':
+          description: Analysis successfully submitted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: Unique task identifier
+                    example: "123e4567-e89b-12d3-a456-426614174000"
+        '400':
+          description: Invalid input data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Invalid input format"
+
+  /api/status/{id}:
+    get:
+      summary: Check the status of a task
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            description: Unique task identifier
+      responses:
+        '200':
+          description: Task status retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: Current task status
+                    example: "IN_PROGRESS"
+                  reason:
+                    type: string
+                    nullable: true
+                    description: Reason for failure, if applicable
+                    example: null
+        '404':
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Invalid task id"
+
+  /api/result/{id}:
+    get:
+      summary: Retrieve the result of a completed task
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            description: Unique task identifier
+      responses:
+        '200':
+          description: Task results retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  RNApdist:
+                    type: number
+                    format: float
+                    description: RNApdist score
+                    example: 0.334
+                  RNAdistance:
+                    type: object
+                    properties:
+                      f:
+                        type: integer
+                        description: First distance measure
+                        example: 16
+                      h:
+                        type: integer
+                        description: Second distance measure
+                        example: 2
+                      w:
+                        type: integer
+                        description: Second distance measure
+                        example: 2
+                      c:
+                        type: integer
+                        description: Second distance measure
+                        example: 2
+                      F:
+                        type: integer
+                        description: First distance measure
+                        example: 16
+                      H:
+                        type: integer
+                        description: Second distance measure
+                        example: 2
+                      W:
+                        type: integer
+                        description: Second distance measure
+                        example: 2
+                      C:
+                        type: integer
+                        description: Second distance measure
+                        example: 2
+        '404':
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Invalid task id"
+
+
